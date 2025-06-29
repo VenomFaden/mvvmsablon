@@ -26,12 +26,10 @@
 
     class MainActivity : ComponentActivity() {
         private val viewModel : UserViewModel by viewModels<UserViewModel>()
-
         override fun onCreate(savedInstanceState: Bundle?) {
             super.onCreate(savedInstanceState)
             enableEdgeToEdge()
             setContent {
-                val rememberTab by remember{ mutableIntStateOf(0) }
                 val navController = rememberNavController()
                 val clickedUser = remember { mutableStateOf(User(0,"","","",null,"","",Company("","",""))) }
                 viewModel.getUsers()
