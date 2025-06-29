@@ -9,26 +9,46 @@
     import androidx.compose.foundation.layout.fillMaxSize
     import androidx.compose.foundation.layout.padding
     import androidx.compose.material3.Scaffold
-    import androidx.compose.material3.Text
-    import androidx.compose.runtime.Composable
+    import androidx.compose.runtime.getValue
+    import androidx.compose.runtime.mutableIntStateOf
+    import androidx.compose.runtime.mutableStateOf
+    import androidx.compose.runtime.remember
     import androidx.compose.ui.Modifier
-    import androidx.compose.ui.tooling.preview.Preview
+    import androidx.navigation.compose.NavHost
+    import androidx.navigation.compose.composable
+    import androidx.navigation.compose.rememberNavController
+    import com.bitnays.retrofitvecompose.model.Company
+    import com.bitnays.retrofitvecompose.model.User
+    import com.bitnays.retrofitvecompose.screens.UserDetay
     import com.bitnays.retrofitvecompose.screens.UserList
     import com.bitnays.retrofitvecompose.ui.theme.RetrofitVeComposeTheme
     import com.bitnays.retrofitvecompose.viewmodel.UserViewModel
 
     class MainActivity : ComponentActivity() {
         private val viewModel : UserViewModel by viewModels<UserViewModel>()
+
         override fun onCreate(savedInstanceState: Bundle?) {
             super.onCreate(savedInstanceState)
             enableEdgeToEdge()
-            viewModel.getUsers()
             setContent {
+                val rememberTab by remember{ mutableIntStateOf(0) }
+                val navController = rememberNavController()
+                val clickedUser = remember { mutableStateOf(User(0,"","","",null,"","",Company("","",""))) }
+                viewModel.getUsers()
                 RetrofitVeComposeTheme {
                     Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                         Box(modifier = Modifier.padding(innerPadding)) {
-
-                            UserList(userList = viewModel.userList.value)
+                            NavHost(navController = navController, startDestination = "user_list")
+                            {
+                                composable("user_list") {
+                                    UserList(userList = viewModel.userList.value, navController,
+                                        clickedUser = { user -> clickedUser.value = user }
+                                    )
+                                }
+                                composable("user_detay") {
+                                    UserDetay(user = clickedUser.value)
+                                }
+                            }
                         }
                     }
                 }
